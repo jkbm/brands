@@ -1,18 +1,22 @@
+#!/usr/bin/python2.7
 # -*- encoding: utf-8 -*-
 from __future__ import unicode_literals
 import requests
 from requests_oauthlib import OAuth1
 from urlparse import parse_qs
-from db import addtwits
+import json
+
+auth = open("mysite/twitter/auth.json", "r")
+auth_json = json.load(auth)
 
 REQUEST_TOKEN_URL = "https://api.twitter.com/oauth/request_token"
 AUTHORIZE_URL = "https://api.twitter.com/oauth/authorize?oauth_token="
 ACCESS_TOKEN_URL = "https://api.twitter.com/oauth/access_token"
-CONSUMER_KEY = "1dO3pJN85Bv0GEUOhmlWV0jPi"
-CONSUMER_SECRET = "Yi8uI1A8eBfOXrSfMyeXetguFpBZX6l3eAvtGHeILnS5SkpHxb"
+CONSUMER_KEY = auth_json['CONSUMER_KEY']
+CONSUMER_SECRET = auth_json['CONSUMER_SECRET']
 
-OAUTH_TOKEN = "43292116-dKxSuEzNLFIW7ACZvseHjjnNWoa7YtnkkRiy22aOd"
-OAUTH_TOKEN_SECRET = "koAHbIv8ewVVIgeMmH60d3elXzPLmFjzyXx4Yv9vKxAg5"
+OAUTH_TOKEN = auth_json['OAUTH_TOKEN']
+OAUTH_TOKEN_SECRET = auth_json['OAUTH_TOKEN_SECRET']
 
 def setup_oauth():
 
@@ -137,3 +141,5 @@ def rest (search, num, file_name):
 
     return data
 
+if __name__ == "__main__":
+    print auth_json
