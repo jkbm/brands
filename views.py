@@ -1,17 +1,15 @@
 #!/usr/bin/python2.7
 # -*- coding: utf-8 -*-
 
-from flask import Flask, render_template, flash, redirect, request, jsonify, abort
+from flask import Flask, render_template, flash, redirect, request, jsonify
 from flask_sslify import SSLify
-from flask_login import LoginManager, login_user
 
-from db import adduser, connection, addtwits, checkresearch
+from twitter.db import adduser, connection, addtwits, checkresearch
 import getdata
 import twitter.twitter  as tlive
 import twitter.twitrest as trest
 import myforms
 import multiprocessing
-import requests
 import analytics
 from ispr.ispr import get_answer
 import numpy as np
@@ -25,10 +23,8 @@ logging.basicConfig(level=logging.DEBUG)
 
 
 app = Flask(__name__)
-login_manager = LoginManager()
 app.secret_key = 'many random bytes'
 sslify = SSLify(app)
-login_manager.init_app(app)
 
 @app.route('/')
 def hello_world():
@@ -41,32 +37,6 @@ def index():
     return render_template('index.html',
                            title='Home')
 
-
-@login_manager.user_loader
-def load_user(user_id):
-    return User.get(user_id)
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    # Here we use a class of some kind to represent and validate our
-    # client-side form data. For example, WTForms is a library that will
-    # handle this for us, and we use a custom LoginForm to validate.
-    form = myforms.LoginForm()
-    if form.validate_on_submit():
-        # Login and validate the user.
-        # user should be an instance of your `User` class
-        login_user(user)
-
-        flash('Logged in successfully.')
-
-        next = request.args.get('next')
-        # is_safe_url should check if the url is safe for redirects.
-        # See http://flask.pocoo.org/snippets/62/ for an example.
-        if not is_safe_url(next):
-            return abort(400)
-
-        return redirect('/index')
-    return render_template('login.html', form=form)
 
 @app.route('/tflash')
 def tflash():

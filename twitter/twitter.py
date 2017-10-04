@@ -1,3 +1,5 @@
+#!/usr/bin/python2.7
+# -*- encoding: utf-8 -*-
 from tweepy import Stream
 from tweepy import OAuthHandler
 from tweepy.streaming import StreamListener
@@ -5,13 +7,14 @@ import json
 import time
 from db import addtwits
 
-ckey = "1dO3pJN85Bv0GEUOhmlWV0jPi"
-csecret = "Yi8uI1A8eBfOXrSfMyeXetguFpBZX6l3eAvtGHeILnS5SkpHxb"
-atoken = "43292116-dKxSuEzNLFIW7ACZvseHjjnNWoa7YtnkkRiy22aOd"
-asecret = "koAHbIv8ewVVIgeMmH60d3elXzPLmFjzyXx4Yv9vKxAg5"
+auth = open("mysite/twitter/auth.json", "r")
+auth_json = json.load(auth)
 
-#seek = raw_input("What to search? ")
-#file = raw_input("File name: ")
+ckey = auth_json['CONSUMER_KEY']
+csecret = auth_json['CONSUMER_SECRET']
+atoken = auth_json['OAUTH_TOKEN']
+asecret = auth_json['OAUTH_TOKEN_SECRET']
+
 num = 0
 tweets = ""
 def stream(file,seek, n, res):
