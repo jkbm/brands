@@ -1,0 +1,6 @@
+{ "/cats 1" : "Cats are everywhere!",
+  "/cats 0" : "There will be no more cats.",
+  "else"   : "Sorry, I don't know that command.",
+  "/meme 1": "Here come the memes",
+  "/meme 0": "Memes are DEAD!"
+}

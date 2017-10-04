@@ -1,0 +1,89 @@
+<html>
+  <head>
+    {% if title %}
+    <title>{{ title }}</title>
+    {% else %}
+    <title>Brand Marketing</title>
+    {% endif %}
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+    integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="static/style.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script>window.jQuery || document.write('<script src="{{
+         url_for('static', filename='jquery.js') }}">\x3C/script>')</script>
+  </head>
+<div class="nr">
+    <h1>ІСПР для інформаційної системи управління брендом</h1>
+    <h2>Класифікація потенційних клієнтів</h2>
+    <form action="" method="post" name="ISPR2">
+        {{ form.hidden_tag() }}
+        <p>
+         Метод класифікації:<br>
+          {{ form.method() }}
+          {% for error in form.method.errors %}
+              <span style="color: red;">[{{ error }}]</span>
+          {% endfor %}<br>
+
+          Кількість повідомлень:<br>
+          {{ form.msgs() }}
+          {% for error in form.msgs.errors %}
+              <span style="color: red;">[{{ error }}]</span>
+          {% endfor %}<br>
+            Стать:<br>
+            {{form.sex()}}
+            {% for error in form.sex.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}<br>
+
+            Кількість "фоловерів":<br>
+            {{form.followers()}}
+            {% for error in form.followers.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}<br>
+
+            Кількість уподобань:<br>
+            {{form.likes()}}
+            {% for error in form.likes.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}<br>
+
+            Кількість актуальних повідомлень:<br>
+            {{form.goodmsgs()}}
+            {% for error in form.goodmsgs.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}<br>
+
+            {{ form.submit }}
+
+        </p>
+<div class="answer">
+    <h1>Відповідь:</h1>
+    <h2>Даний користувач відноситься до другого класу - потенційний клієнт.</h2>
+    <hr>
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul>
+    {% for message in messages %}
+        <li><h1>{{ message }}</h1> </li>
+    {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+    {% block content %}{% endblock %}
+  </div>
+</form>
+</div>
+
+      <div id="footer">
+      {% block footer %}
+      &copy; Copyright 2017 by <a href="http://www.jkbmwp.hol.es">JekaBM</a>.
+      {% endblock %}
+    </div>
+  </body>
+</html>

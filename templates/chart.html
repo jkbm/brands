@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head>
+    <title>
+        Research page
+    </title>
+</head>
+<style>
+ body {
+     background-color: lightblue;
+ }
+ svg {
+    display: block;
+    margin: auto;
+     background-color: white;
+ }
+ H1{
+     text-align: center;
+ }
+</style>
+
+<script src="https://d3js.org/d3.v4.min.js"></script>
+
+<body>
+    <H1>Statistical analysis</H1>
+    <svg class="chart"></svg>
+</body>
+
+<script>
+
+var data = [
+{% for item in jdata %}
+    {"name":"{{item}}",
+    "value" :{{jdata[item]}}},
+
+{% endfor %}
+    ];
+
+var color = d3.scaleOrdinal(d3.schemeCategory20c);
+
+var max_x = {{max_data}};
+var margin = {top: 20, right: 30, bottom: 30, left: 40},
+    width = 960 - margin.left - margin.right,
+    height = 500 - margin.top - margin.bottom;
+
+var x = d3.scaleBand()
+    .range([0, width])
+    .paddingInner(0.05);
+
+var y = d3.scaleLinear()
+    .domain([0, max_x])
+    .range([height, 0]);
+
+x.domain(data.map(function(d) { return d.name; }));
+y.domain([0, d3.max(data, function(d) { return d.value; })]);
+
+var xAxis = d3.axisBottom(x)
+    .ticks(data.size);
+
+var yAxis = d3.axisLeft(y)
+    .ticks(10);
+
+var chart = d3.select(".chart")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+  chart.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0," + height + ")")
+      .call(xAxis);
+
+  chart.append("g")
+      .attr("class", "y axis")
+      .call(yAxis);
+
+  var bars = chart.selectAll(".bar")
+      .data(data)
+    .enter().append("rect")
+      .attr("class", "bar")
+      .attr("id", function(d, i) {
+            return i;
+        })
+      .attr("x", function(d) { return x(d.name); })
+      .attr("y", function(d) { return y(d.value); })
+      .attr("height", function(d) { return height - y(d.value); })
+      .attr("width", x.bandwidth())
+      .on('mouseover', function() {
+            d3.select(this)
+            	.attr("fill", "LightCoral");
+        })
+        .on("mouseout", function(d, i) {
+            d3.select(this).attr("fill", function() {
+                return "" + color(this.id) + "";
+            });
+        });
+
+      d3.selectAll('rect').attr("fill", function(d, i) {
+            return color(i);});
+
+
+function type(d) {
+  d.value = +d.value; // coerce to number
+  return d;
+}
+
+</script>

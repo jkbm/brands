@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <body><div id='showblock'>
+    <div id='show'></div>
+    </div>
+      <script type=text/javascript>
+      $(document).ready(function(){
+         setInterval(function(){
+             $('#show').load('/results?research={{res}}')
+         },3000);
+      });
+        </script>
+
+  </body>
+{% endblock %}

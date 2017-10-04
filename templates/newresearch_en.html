@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <script type="text/javascript">
+    function set_openid(openid, pr)
+    {
+        u = openid.search('<username>');
+        if (u != -1) {
+            // openid requires username
+            user = prompt('Enter your ' + pr + ' username:');
+            openid = openid.substr(0, u) + user;
+        }
+        form = document.forms['NewResearch'];
+        form.elements['search'].value = search;
+    }
+    </script>
+<div class="nr">
+    <h1>Enter new Twitter research information: </h1>
+    <form action="" method="post" name="NewResearch">
+        {{ form.hidden_tag() }}
+        <p>
+          Research title:<br>
+          {{ form.name(size=80) }}
+          {% for error in form.search.errors %}
+              <span style="color: red;">[{{ error }}]</span>
+          {% endfor %}<br>
+            Search query:<br>
+            {{ form.search(size=80) }}
+            {% for error in form.search.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}<br>
+            Number of messages:<br>
+            {{form.number()}}
+            {% for error in form.number.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}<br>
+            Method of data retrival:<br>
+            {{form.radio()}}
+            {% for error in form.radio.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}<br>
+            Message location:<br>
+            {{form.location()}}
+            {% for error in form.location.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}<br>
+            Additional parameters:<br>
+            {{form.params()}}
+            {% for error in form.params.errors %}
+                <span style="color: red;">[{{ error }}]</span>
+            {% endfor %}<br>
+
+
+        </p>
+        <p>{{ form.remember_me }}</p>
+        <p><input type="submit" value="Start"></p>
+
+<p id="demo">STREAM</p>
+
+<input type="button" name="theButton" value="Detail" class="btn" data-resid="{{ resid }}" />
+<p style="color: green;" id="the"></p>
+
+<script>
+$(document).on('click', '.btn', function() {
+
+    var name = $(this).data('resid');
+
+    if (name != undefined && name != null) {
+        window.location = '/dresults?research=' + name;
+    }
+});
+</script>
+    </form>
+</div>
+{% endblock %}
