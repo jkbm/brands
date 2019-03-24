@@ -13,6 +13,7 @@ import multiprocessing
 import analytics
 from ispr.ispr import get_answer
 import numpy as np
+import requests
 import bot.bot_core as bot_core
 
 import json
@@ -226,12 +227,13 @@ TeleBot home: setup WebHook and process requests
 """
 @app.route('/telebot',methods=['GET','POST','OPTIONS'])
 def telebot():
-    BOT_TOKEN = "294249200:AAEsVNT9AIb8c__rv07ifOP-r9eCKJfeON8"
+    BOT_TOKEN = "634125151:AAGhQrOStKmo4nA1skOZWHYkcWWrRonbIas"
     myurl = "https://jekabm.pythonanywhere.com/telebot"
     URL = "https://api.telegram.org/bot%s/" % BOT_TOKEN
     f = open('posts.txt', 'a')
     r = ""
     """ set up WebHook
+
     try:
         r = requests.get(URL + "setWebhook?url=%s" % myurl)
         #r = requests.get(URL + "deleteWebhook")
@@ -245,10 +247,13 @@ def telebot():
     except Exception as e:
         logging.error("There was an error setting up WebHook: %s" % e)
     r = r.json()
+    jdata = r
     """
     jdata = '{"update_id":273032929, "message":{"message_id":48,"from":{"id":289232696,"first_name":"Evgeniy","last_name":"Beardear"},"chat":{"id":289232696,"first_name":"Evgeniy","last_name":"Beardear","type":"private"},"date":1479225848,"text":"Chicken soup."}}'
 
     data = request.data
+    #r = requests.get(URL + "deleteWebhook")
+    #print("WEBHOOK INFO: " + r.text)
     if data:
         jdata = str.join(" ", data.splitlines())
         f.write(jdata)

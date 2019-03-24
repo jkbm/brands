@@ -16,8 +16,8 @@ class NewResearch(Form):
     search = StringField('search', validators=[DataRequired()])
     number = IntegerField('number', validators=[DataRequired()])
     radio =  RadioField('radio', choices=[('one','Stream'),('two','History')], coerce=unicode)
-    location = StringField('location', validators=[DataRequired()])
-    params = StringField('params', validators=[DataRequired()])
+    location = StringField('location', validators=[DataRequired()], default='USA')
+    params = StringField('params', validators=[DataRequired()], default='None')
 
 class ISPR(Form):
     SECRET_KEY = 'LUL'

@@ -30,7 +30,7 @@ def stream(file,seek, n, res):
 					global tweets
 					saveNum.close()
 					text = json.loads(data)
-					tex = text['text'].decode('latin1').encode('utf-8')
+					tex = text['text']
 					saveFile = open('/home/jekabm/mysite/files/' + file + '.csv', 'a')
 					tweets = tweets + "||" + tex
 					saveFile.write(tex)

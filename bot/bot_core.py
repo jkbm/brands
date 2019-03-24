@@ -10,7 +10,7 @@ from bot_response import createResponse as Answer
 import urllib, urllib2
 
 
-BOT_TOKEN = "294249200:AAEsVNT9AIb8c__rv07ifOP-r9eCKJfeON8"
+BOT_TOKEN = "634125151:AAGhQrOStKmo4nA1skOZWHYkcWWrRonbIas"
 URL = "https://api.telegram.org/bot%s/" % BOT_TOKEN
 MyURL = "http://jekabm.pythonanywhere.com/telebot"
 
@@ -32,6 +32,7 @@ session = requests.Session()
 def Respond(message):
     params = Answer(message)
     sent = requests.get(URL + "sendMessage", params = params)
+    logging.debug(sent.text)
     return sent
 
 
@@ -52,4 +53,4 @@ def sendAnswer(message):
 
 if __name__ == "__main__":
 
-    logging.debug('File run')
+    logging.debug('Telegram bot module run.')

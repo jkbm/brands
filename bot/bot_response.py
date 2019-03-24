@@ -16,6 +16,8 @@ latin_letters= {}
 symbols = (u"абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ",
            u"abvgdeejzijklmnoprstufhzcss_y_euaABVGDEEJZIJKLMNOPRSTUFHZCSS_Y_EUA")
 
+path = "/home/jekabm/mysite/bot/"
+
 
 #tr = {ord(a):ord(b) for a, b in zip(*symbols)}
 # for Python 2.*:
@@ -35,7 +37,7 @@ order = {}
 
 def createResponse(message):
     db = DBHelper()
-    settings = open('/home/jekabm/mysite/bot_settings.json', 'r')
+    settings = open(path + 'bot_settings.json', 'r')
     jsettings = json.load(settings)
     settings.close()
 
@@ -150,10 +152,10 @@ def createResponse(message):
 
 #Select response for a command message
 def commandResponse(text,chat,db):
-    jcmnds = open('/home/jekabm/mysite/bot_commands.json', 'r')
+    jcmnds = open(path + 'bot_commands.json', 'r')
     cmnds = json.load(jcmnds)
     jcmnds.close()
-    settings = open('/home/jekabm/mysite/bot_settings.json', 'r')
+    settings = open(path + 'bot_settings.json', 'r')
     jsettings = json.load(settings)
     settings.close()
 
@@ -164,22 +166,22 @@ def commandResponse(text,chat,db):
     elif text == "/help": answer = "This is a movie bot. Type a name of a movie + 'movie' to use it."
     elif text == "/meme 1":
         jsettings['memegen'] = True
-        with open("/home/jekabm/mysite/bot_settings.json", "w") as jsonFile:
+        with open(path + "bot_settings.json", "w") as jsonFile:
             jsonFile.write(json.dumps(jsettings))
         answer = cmnds[text]
     elif text == "/meme 0":
         jsettings['memegen'] = False
-        with open("/home/jekabm/mysite/bot_settings.json", "w") as jsonFile:
+        with open(path + "'bot_settings.json", "w") as jsonFile:
             jsonFile.write(json.dumps(jsettings))
         answer = cmnds[text]
     elif text == "/cats 1":
         jsettings['catsgen'] = True
-        with open("/home/jekabm/mysite/bot_settings.json", "w") as jsonFile:
+        with open(path + "bot_settings.json", "w") as jsonFile:
             jsonFile.write(json.dumps(jsettings))
         answer = cmnds[text]
     elif text == "/cats 0":
         jsettings['catsgen'] = False
-        with open("/home/jekabm/mysite/bot_settings.json", "w") as jsonFile:
+        with open(path + "bot_settings.json", "w") as jsonFile:
             jsonFile.write(json.dumps(jsettings))
         answer = cmnds[text]
     else:
