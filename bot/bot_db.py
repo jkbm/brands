@@ -1,4 +1,5 @@
 import MySQLdb
+import logging
 
 class DBHelper:
 
@@ -26,11 +27,14 @@ class DBHelper:
 
     def add_user(self, user):
         stmt = "INSERT INTO users (id, first_name, last_name) VALUES (%s, %s, %s)"
-        args = (user["id"], user["first_name"], user["last_name"], )
-        self.c.execute("SELECT * from users where id = " + str(user["id"]) + ";")
-        if not self.c.rowcount:
-            self.c.execute(stmt, args)
-        self.conn.commit()
+        if user.get("id"):
+            args = (user["id"], user.get("first_name", ""), user.get("last_name", ""), )
+            self.c.execute("SELECT * from users where id = " + str(user["id"]) + ";")
+            if not self.c.rowcount:
+                self.c.execute(stmt, args)
+            self.conn.commit()
+        else:
+            logging.error("No user ID provided.")
 
     def add_update(self, id):
         stmt = "INSERT INTO updates (update_id) VALUES (%s)"
