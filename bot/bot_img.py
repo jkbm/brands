@@ -5,6 +5,7 @@ from googleapiclient.discovery import build
 
 def main(search):
 
+  # TODO remove creds
   service = build("customsearch", "v1",
             developerKey="AIzaSyAFAddCugF69HZId4VzoOhT30s0IXxw7DM")
 
@@ -21,6 +22,7 @@ def main(search):
 
 
 if __name__ == '__main__':
+  # TODO move to tests
   search = "CHICKEN"
   f = main(search)
   print f['title']

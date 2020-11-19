@@ -1,5 +1,7 @@
 import requests
 import json
+
+#TODO remove creds
 payload = {'api_key' : 'bb18f8d3d31f7eb5cc97e4fd4bf3832b'}
 
 '''
@@ -32,4 +34,3 @@ def getMovie(search_q):
         ret = {'title': 'There is no such movie in our database.', 'release_date':'_______', 'overview':'Unfortunately, no info on this movie', 'poster_path' : "/lZpWprJqbIFpEV5uoHfoK0KCnTW.jpg"}
 
     return ret
-

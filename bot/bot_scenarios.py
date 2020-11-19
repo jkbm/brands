@@ -98,6 +98,8 @@ class ChatScenarios:
     
     @classmethod
     def fun_response(cls, params):
+        """Get function for correct scenario or send generic answer if not found.
+        """
         words = params.get("input_text", "").split()
-        func = response_functions.get(words[-1])
-        return func(words)
+        func = response_functions.get(words[-1], get_default_response)
+        return func(params)
