@@ -2,11 +2,13 @@
 # -*- coding: utf-8 -*-
 import requests
 import logging
-logging.basicConfig(level = logging.DEBUG)
+
+from log_config import logger
+logger.debug("test")
 import json
 
 from bot_img import main as getImage
-from bot_response import createResponse as Answer
+from bot_response import createResponse as getAnswer
 import urllib, urllib2
 
 
@@ -28,28 +30,11 @@ session = requests.Session()
 
 
 #MAIN
-
-def Respond(message):
-    params = Answer(message)
-    sent = requests.get(URL + "sendMessage", params = params)
-    logging.debug(sent.text)
-    return sent
-
-
-def sendAnswer(message):
-    try:
-        utf = message['text'].encode("utf8")
-        answer = "Hey, {0}, what's up? You said: {1}, right?".format(message['from']['first_name'], utf)
-    except Exception as e:
-        logging.error("Can't decode: %s" % e)
-        answer = "Nope"
-
-    params = {'chat_id': message['from']['id'], 'text': answer}
-
-    sent = requests.get(URL + "sendMessage", params = params)
-    logging.debug(sent.status_code)
-
-#sendAnswer(message)
+def respond(message):
+    params = getAnswer(message)
+    response = requests.get(URL + "sendMessage", params = params)
+    logging.debug(response.text)
+    return response
 
 if __name__ == "__main__":
 

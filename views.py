@@ -69,7 +69,6 @@ def chart():
 
 @app.route('/register')
 def reg():
-    adduser()
     flash('wazzup')
     return render_template("register.html")
 
@@ -121,7 +120,7 @@ def Research_en():
     if form.validate_on_submit():
         resid = checkresearch()
         if form.radio.data == 'two':
-            done = twitrest.rest(form.search.data, form.number.data, form.name.data)
+            done = trest.rest(form.search.data, form.number.data, form.name.data)
 
             n = 0
             for x in range(0,len(done)):
@@ -213,13 +212,6 @@ def add_numbers():
     b = request.args.get('b', 0, type=int)
     return jsonify(result=a + b)
 
-
-@app.route('/_add_twit')
-def add_twit():
-
-    return jsonify(twit)
-
-
 """
 ***
 TeleBot home: setup WebHook and process requests
@@ -227,13 +219,12 @@ TeleBot home: setup WebHook and process requests
 """
 @app.route('/telebot',methods=['GET','POST','OPTIONS'])
 def telebot():
+    """ set up WebHook
     BOT_TOKEN = "634125151:AAGhQrOStKmo4nA1skOZWHYkcWWrRonbIas"
     myurl = "https://jekabm.pythonanywhere.com/telebot"
     URL = "https://api.telegram.org/bot%s/" % BOT_TOKEN
-    f = open('posts.txt', 'a')
+    
     r = ""
-    """ set up WebHook
-
     try:
         r = requests.get(URL + "setWebhook?url=%s" % myurl)
         #r = requests.get(URL + "deleteWebhook")
@@ -256,7 +247,8 @@ def telebot():
     #print("WEBHOOK INFO: " + r.text)
     if data:
         jdata = str.join(" ", data.splitlines())
-        f.write(jdata)
+        with open('posts.txt', 'a') as f:
+            f.write(jdata + "\n")
         try:
             jdata = json.dumps(json.JSONDecoder().decode(jdata))
         except Exception as e:
@@ -265,11 +257,11 @@ def telebot():
 
         try:
             jdata = json.loads(jdata)
-            jdata = jdata['message']
+            jmessage = jdata.get('message')
         except Exception as e:
-            jdata = "NO WAY: %s" % e
+            jmessage = {}
 
-        bot_core.Respond(jdata)
+        bot_core.respond(jmessage)
 
     return render_template("telebot.html", message=jdata)
 

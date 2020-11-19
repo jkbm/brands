@@ -22,8 +22,6 @@ path = "/home/jekabm/mysite/bot/"
 #tr = {ord(a):ord(b) for a, b in zip(*symbols)}
 # for Python 2.*:
 tr = dict( [ (ord(a), ord(b)) for (a, b) in zip(*symbols) ] )
-key_words = ['cupcake', 'cake', 'muffin', u"капкейк", u"торт", u"кекс"]
-flavours = ['chocolate', 'vanila', 'blueberry']
 heys = ["hey", "hello", "hi", "greetings", u"привет"]
 images = ['cat', 'cats', 'meme']
 name = 'username'
@@ -34,87 +32,89 @@ general_answers = ["Здравствуй, {0}, чудная сегодня по�
 "Просыпаешься… в самолёте. Где — в Лос-Анжелесе, в Сан-Франциско? Просыпаешься… в Далласе, в Фортворде. Где бы ты ни был, где-то в Центральных штатах, — это твоя жизнь, и с каждой минутой она подходит к концу. Если можно проснуться в другом времени, и в другом месте, нельзя ли проснуться другим человеком?",
 "Простите, у вас тут можно приземлиться?"]
 order = {}
+class ChatScenarios:
+    #Select response for a command message
+    @classmethod
+    def command_response(cls, text, chat, db):
+        with open(path + 'bot_commands.json', 'r') as jcmnds:
+            cmnds = json.load(jcmnds)
+        with open(path + 'bot_settings.json', 'r') as settings:
+            jsettings = json.load(settings)
+
+        if text == "/start":
+            name = "{0} {1}".format(chat['first_name'].encode('utf-8'), chat['last_name'].encode('utf-8'))
+            db.add_conversation(chat['id'], name)
+            answer = u"Greeting fellow traveller of the virtual galaxy of the Internet. I'm JKBMbot of JKBM inn, here to assist you. {0}. Use /help to get to know me.".format(u"\U0001F603")
+        elif text == "/help": answer = "This is a movie bot. Type a name of a movie + 'movie' to use it."
+        elif text == "/meme 1":
+            jsettings['memegen'] = True
+            with open(path + "bot_settings.json", "w") as jsonFile:
+                jsonFile.write(json.dumps(jsettings))
+            answer = cmnds[text]
+        elif text == "/meme 0":
+            jsettings['memegen'] = False
+            with open(path + "'bot_settings.json", "w") as jsonFile:
+                jsonFile.write(json.dumps(jsettings))
+            answer = cmnds[text]
+        elif text == "/cats 1":
+            jsettings['catsgen'] = True
+            with open(path + "bot_settings.json", "w") as jsonFile:
+                jsonFile.write(json.dumps(jsettings))
+            answer = cmnds[text]
+        elif text == "/cats 0":
+            jsettings['catsgen'] = False
+            with open(path + "bot_settings.json", "w") as jsonFile:
+                jsonFile.write(json.dumps(jsettings))
+            answer = cmnds[text]
+        else:
+            answer = cmnds['else']
+
+        return answer
 
 def createResponse(message):
-    db = DBHelper()
-    settings = open(path + 'bot_settings.json', 'r')
-    jsettings = json.load(settings)
-    settings.close()
-
-    stemmer2 = SnowballStemmer("russian", ignore_stopwords=True)
-    stemmed = []
-
+    with open(path + 'bot_settings.json', 'r') as settings:
+        jsettings = json.load(settings)
+    if not isinstance(message, dict):
+        logging.debug(message)
+        return {}
     chat = message['chat']
     name = chat['first_name'].encode('utf-8')
     user = message['from']
 
     try:
-        last_name = chat['last_name']
         full_name = "{0} {1}".format(name, chat['last_name'].encode('utf-8'))
     except:
         full_name = "{0}".format(name)
-        chat['last_name']=""
+        chat['last_name'] = ""
 
     try:
         text = message['text']
         if only_roman_chars(text) == False:
             text = text.translate(tr)
-            print text
     except Exception as e:
         text = message['text'] = "NO TEXT: %s" % e
 
-    answer = general_answers[randint(0,len(general_answers))] #GENERAL GREETING
-
+    """
+    stemmer2 = SnowballStemmer("russian", ignore_stopwords=True)
+    stemmed = []
     for word in text:
         stemmed.append(stemmer2.stem(word))
-
-    words = text.lower().split()
-
-    for key in key_words:
-        if key in words:
-            order['type'] = key
-            break
-        else:
-            logging.debug('Nope')
+    """
+    # add db entry
+    db = DBHelper()
     ctime = time.strftime('%Y-%m-%d %H:%M:%S') #current time
-
-    try:
-        last_name = user['last_name']
-    except:
-        user['last_name'] = "last name undefiend"
-
     db.add_item(text, user['id'], ctime)
     db.add_user(user)
+    words = text.lower().split()
+    params = {'chat_id' : chat['id'], 'text' : None} #answer parameters dictionary
 
-    words = text.lower().split() #break text into words
-    for key in key_words:
-        if key in words:
-            order['type'] = key
-            break
-        else:
-            logging.debug('Nope')
-    for taste in flavours:
-        if taste in words:
-            order['taste'] = taste
-            break
-
-    for key in key_words:
-        if key in words:
-            logging.debug(key)
-            answer = "Вы хотите заказать {0}?".format(key.encode('utf-8'))
-            logging.debug(key)
-        else:
-            logging.debug('Nope')
-
+    # 'hey' response
     if message['text'].lower() in heys:
-        answer = "Hey, %s!" % full_name
-
-    params = {'chat_id' : chat['id'], 'text' : answer} #answer parameters dictionary
-
+        params['text'] = "Hey, %s!" % full_name
 
     #command response
     if text.startswith("/"):
-        params['text'] = commandResponse(text, chat, db)
+        params['text'] = ChatScenarios.command_response(text, chat, db)
     #question response
     if '?' in text:
         params['text'] = 'I got your question, {0}.'.format(chat['first_name'].encode('utf-8'))
@@ -135,7 +135,6 @@ def createResponse(message):
     elif 'cat' in words:
         params['text'] = "Your cats are asleep. Type '/cats 1' to wake them up."
 
-
     #MOVIE
     if 'movie' in text.lower():
         query = text.replace('movie','')
@@ -147,48 +146,11 @@ def createResponse(message):
     if text == "Chicken soup.":
         params['text'] = "Someone visited the web page. Kick them out!"
 
+    # default answer
+    if not params['text']:
+        params['text'] = general_answers[randint(0,len(general_answers))] #GENERAL GREETING
+
     return params
-
-
-#Select response for a command message
-def commandResponse(text,chat,db):
-    jcmnds = open(path + 'bot_commands.json', 'r')
-    cmnds = json.load(jcmnds)
-    jcmnds.close()
-    settings = open(path + 'bot_settings.json', 'r')
-    jsettings = json.load(settings)
-    settings.close()
-
-    if text == "/start":
-        name = "{0} {1}".format(chat['first_name'].encode('utf-8'), chat['last_name'].encode('utf-8'))
-        db.add_conversation(chat['id'], name)
-        answer = u"Greeting fellow traveller of the virtual galaxy of the Internet. I'm JKBMbot of JKBM inn, here to assist you. {0}. Use /help to get to know me.".format(u"\U0001F603")
-    elif text == "/help": answer = "This is a movie bot. Type a name of a movie + 'movie' to use it."
-    elif text == "/meme 1":
-        jsettings['memegen'] = True
-        with open(path + "bot_settings.json", "w") as jsonFile:
-            jsonFile.write(json.dumps(jsettings))
-        answer = cmnds[text]
-    elif text == "/meme 0":
-        jsettings['memegen'] = False
-        with open(path + "'bot_settings.json", "w") as jsonFile:
-            jsonFile.write(json.dumps(jsettings))
-        answer = cmnds[text]
-    elif text == "/cats 1":
-        jsettings['catsgen'] = True
-        with open(path + "bot_settings.json", "w") as jsonFile:
-            jsonFile.write(json.dumps(jsettings))
-        answer = cmnds[text]
-    elif text == "/cats 0":
-        jsettings['catsgen'] = False
-        with open(path + "bot_settings.json", "w") as jsonFile:
-            jsonFile.write(json.dumps(jsettings))
-        answer = cmnds[text]
-    else:
-        answer = cmnds['else']
-
-    return answer
-
 
 def is_latin(uchr):
     try: return latin_letters[uchr]

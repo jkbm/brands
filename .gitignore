@@ -1,3 +1,5 @@
 *.pyc
 temp.py
 twitter/auth.json
+.vscode
+*.log
