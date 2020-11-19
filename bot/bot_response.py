@@ -1,79 +1,24 @@
 #!/usr/bin/python2.7
 # -*- coding: utf-8 -*-
-from bot_db import DBHelper
-from bot_img import main as getImage
-from bot_movie import getMovie
-from nltk.stem.snowball import SnowballStemmer
-from random import randint
 import logging
 import json
 import time
 import unicodedata as ud
 
+from nltk.stem.snowball import SnowballStemmer
+
+from bot_db import DBHelper
+from constants import HEYS, SYMBOLS
+from bot_scenarios import ChatScenarios
 
 latin_letters= {}
 
-symbols = (u"абвгдеёжзийклмнопрстуфхцчшщъыьэюяАБВГДЕЁЖЗИЙКЛМНОПРСТУФХЦЧШЩЪЫЬЭЮЯ",
-           u"abvgdeejzijklmnoprstufhzcss_y_euaABVGDEEJZIJKLMNOPRSTUFHZCSS_Y_EUA")
-
-path = "/home/jekabm/mysite/bot/"
-
-
 #tr = {ord(a):ord(b) for a, b in zip(*symbols)}
 # for Python 2.*:
-tr = dict( [ (ord(a), ord(b)) for (a, b) in zip(*symbols) ] )
-heys = ["hey", "hello", "hi", "greetings", u"привет"]
-images = ['cat', 'cats', 'meme']
-name = 'username'
-general_answers = ["Здравствуй, {0}, чудная сегодня погода, не правда ли?".format(name), "Он принёс три кармана:Первый карман – с пирогами,Второй карман – с орехами…", "А где щи, там и ищи.", "А дело бывало — и коза волка съедала.", "Без складу по складам, без толку по толкам.",
-"Февраль богат снегом, апрель -водою.", "Проснитесь и пойте, морпехи! День в морской пехоте - кусочек счастья. Каждая еда - банкет. Каждая выплата - состояние. Каждое построение - парад. Не служба - праздник!", "Ты выглядишь так, как я себя чувствую.",
-"Они лезут из стен! Из этих чёртовых стен!", "Хемингуэй когда-то сказал: «Мир — это прекрасное место. И за него стоит бороться». Со второй фразой я согласен.", "Ты хочешь быть лучше всех. Но людям не нужен герой, они хотят есть чизбургеры, играть в лотерею и смотреть телевизор.",
-"Люди всё время меня спрашивают: знаю ли я Тайлера Дёрдена?", "Я обрёл свободу. Свобода есть утрата всяческих надежд",
-"Просыпаешься… в самолёте. Где — в Лос-Анжелесе, в Сан-Франциско? Просыпаешься… в Далласе, в Фортворде. Где бы ты ни был, где-то в Центральных штатах, — это твоя жизнь, и с каждой минутой она подходит к концу. Если можно проснуться в другом времени, и в другом месте, нельзя ли проснуться другим человеком?",
-"Простите, у вас тут можно приземлиться?"]
-order = {}
-class ChatScenarios:
-    #Select response for a command message
-    @classmethod
-    def command_response(cls, text, chat, db):
-        with open(path + 'bot_commands.json', 'r') as jcmnds:
-            cmnds = json.load(jcmnds)
-        with open(path + 'bot_settings.json', 'r') as settings:
-            jsettings = json.load(settings)
+tr = dict( [ (ord(a), ord(b)) for (a, b) in zip(*SYMBOLS) ] )
 
-        if text == "/start":
-            name = "{0} {1}".format(chat['first_name'].encode('utf-8'), chat['last_name'].encode('utf-8'))
-            db.add_conversation(chat['id'], name)
-            answer = u"Greeting fellow traveller of the virtual galaxy of the Internet. I'm JKBMbot of JKBM inn, here to assist you. {0}. Use /help to get to know me.".format(u"\U0001F603")
-        elif text == "/help": answer = "This is a movie bot. Type a name of a movie + 'movie' to use it."
-        elif text == "/meme 1":
-            jsettings['memegen'] = True
-            with open(path + "bot_settings.json", "w") as jsonFile:
-                jsonFile.write(json.dumps(jsettings))
-            answer = cmnds[text]
-        elif text == "/meme 0":
-            jsettings['memegen'] = False
-            with open(path + "'bot_settings.json", "w") as jsonFile:
-                jsonFile.write(json.dumps(jsettings))
-            answer = cmnds[text]
-        elif text == "/cats 1":
-            jsettings['catsgen'] = True
-            with open(path + "bot_settings.json", "w") as jsonFile:
-                jsonFile.write(json.dumps(jsettings))
-            answer = cmnds[text]
-        elif text == "/cats 0":
-            jsettings['catsgen'] = False
-            with open(path + "bot_settings.json", "w") as jsonFile:
-                jsonFile.write(json.dumps(jsettings))
-            answer = cmnds[text]
-        else:
-            answer = cmnds['else']
-
-        return answer
 
 def createResponse(message):
-    with open(path + 'bot_settings.json', 'r') as settings:
-        jsettings = json.load(settings)
     if not isinstance(message, dict):
         logging.debug(message)
         return {}
@@ -105,50 +50,21 @@ def createResponse(message):
     ctime = time.strftime('%Y-%m-%d %H:%M:%S') #current time
     db.add_item(text, user['id'], ctime)
     db.add_user(user)
-    words = text.lower().split()
-    params = {'chat_id' : chat['id'], 'text' : None} #answer parameters dictionary
+    params = {'chat_id' : chat['id'], 'text' : None, 'input_text': text} #answer parameters dictionary
 
     # 'hey' response
-    if message['text'].lower() in heys:
+    if message['text'].lower() in HEYS:
         params['text'] = "Hey, %s!" % full_name
 
     #command response
     if text.startswith("/"):
         params['text'] = ChatScenarios.command_response(text, chat, db)
+        return params
     #question response
-    if '?' in text:
+    if text.endswith('?'):
         params['text'] = 'I got your question, {0}.'.format(chat['first_name'].encode('utf-8'))
-
-    #MEME
-    if 'meme' in text.lower() and jsettings['memegen'] == True:
-        img = getImage(text)
-        params['text'] = img['link']
-        #requests.get(URL + 'sendPhoto', data=data, files=files)
-    elif 'meme' in text:
-        params['text'] = "Your memes are off. Type '/meme 1' to turn them on."
-
-    #CATS
-    if 'cat' in words and jsettings['catsgen'] == True:
-        img = getImage(text)
-        params['text'] = img['link']
-        #requests.get(URL + 'sendPhoto', data=data, files=files)
-    elif 'cat' in words:
-        params['text'] = "Your cats are asleep. Type '/cats 1' to wake them up."
-
-    #MOVIE
-    if 'movie' in text.lower():
-        query = text.replace('movie','')
-        movie = getMovie(query)
-        params['text'] = '<b>{0}</b>  \nRelease date: {1} \n    {2} \n https://image.tmdb.org/t/p/w500{3}'.format(movie['title'], movie['release_date'], movie['overview'].encode('utf-8').strip(), movie['poster_path'])
-        params['parse_mode'] = 'HTML'
-
-    #WebPage visit
-    if text == "Chicken soup.":
-        params['text'] = "Someone visited the web page. Kick them out!"
-
-    # default answer
-    if not params['text']:
-        params['text'] = general_answers[randint(0,len(general_answers))] #GENERAL GREETING
+    # special mode
+    params = ChatScenarios.fun_response(params)
 
     return params
 
