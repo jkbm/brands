@@ -354,6 +354,6 @@ def temp():
 @app.route('/echo', methods=["GET", "POST"])
 def echo():
     with open("echo.log", "a+") as f:
-        msg = "Request from {}({}). Data: {}. Args: {}".format(request.remote_addr, request.method, request.data, request.args)
+        msg = "Request from {}({}). Data: {}. Args: {}\n".format(request.remote_addr, request.method, request.data, request.args)
         f.write(msg)
     return Response(status=200)
