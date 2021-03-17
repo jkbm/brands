@@ -355,5 +355,5 @@ def temp():
 def echo():
     with open("echo.log", "a+") as f:
         msg = "Request from {}. Data: {}. Args: {}".format(request.remote_addr, request.data, request.args)
-        f.write()
+        f.write(msg)
     return Response(status=200)
