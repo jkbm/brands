@@ -1,7 +1,7 @@
 #!/usr/bin/python2.7
 # -*- coding: utf-8 -*-
 
-from flask import Flask, render_template, flash, redirect, request, jsonify
+from flask import Flask, render_template, flash, redirect, request, jsonify, Response
 from flask_sslify import SSLify
 
 from twitter.db import adduser, connection, addtwits, checkresearch
@@ -350,3 +350,10 @@ def ispr3():
 def temp():
     data = '\u041c\u043e\u0443\u0440\u0438\u043d\u044c\u043e \u043f\u0440\u0438\u0437\u043d\u0430\u043b\u0441\u044f, \u0447\u0435\u043c \u0435\u0433\u043e \u0443\u0434\u0438\u0432\u0438\u043b "\u0427\u0435\u043b\u0441\u0438'
     return render_template('temp.html', data = str(data).decode('utf-8'))
+
+@app.route('/echo'):
+def echo():
+    with open("echo.log", "a+") as f:
+        msg = "Request from {}. Data: {}. Args: {}".format(request.remote_addr, request.data, request.args)
+        f.write()
+    return Response(status=200)
